@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <link rel="stylesheet" href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css"/>
+</head>
+<body>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Register</h2>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+
+            <form th:action="@{/participant/form}" method="post" th:object="${user}">
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" th:field="*{email}" class="form-control" id="email" required/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" th:field="*{name}" class="form-control" id="name" required/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" th:field="*{password}" class="form-control" id="password" required/>
+                </div>
+
+                <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+                <button type="submit" class="btn btn-success w-100">Register</button>
+            </form>
+
+            <div class="text-center mt-3">
+                <a th:href="@{/login}">Already have an account? Sign in</a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

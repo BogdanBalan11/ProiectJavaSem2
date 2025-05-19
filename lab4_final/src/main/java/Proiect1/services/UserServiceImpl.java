@@ -6,18 +6,24 @@ import Proiect1.dtos.UserLoginDTO;
 import Proiect1.dtos.UserRegistrationDTO;
 import Proiect1.exceptions.UserWithSameEmailExists;
 import Proiect1.repositories.UserRepository;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Optional;
 
 @Service
-public class UserServiceImpl implements  UserService{
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    UserServiceImpl(UserRepository userRepository){
+    UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder){
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -30,7 +36,7 @@ public class UserServiceImpl implements  UserService{
 
         User user = new User();
         user.setEmail(registrationDTO.getEmail());
-        user.setPassword(registrationDTO.getPassword());
+        user.setPassword(passwordEncoder.encode(registrationDTO.getPassword()));
         user.setName(registrationDTO.getName());
         user.setBalance(BigDecimal.ZERO);
 
@@ -43,11 +49,11 @@ public class UserServiceImpl implements  UserService{
         Optional<User> userOpt = userRepository.findByEmail(loginDTO.getEmail());
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            if (loginDTO.getPassword().equals(user.getPassword())) {
+            if (passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
                 return convertToDTO(user);
             }
         }
-        return null;
+        throw new BadCredentialsException("Invalid email or password");
     }
 
     private UserDTO convertToDTO(User user) {
@@ -57,5 +63,16 @@ public class UserServiceImpl implements  UserService{
         dto.setName(user.getName());
         dto.setBalance(user.getBalance());
         return dto;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return org.springframework.security.core.userdetails.User
+                .withUsername(user.getEmail())
+                .password(user.getPassword())
+                .roles("USER")
+                .build();
     }
 }
