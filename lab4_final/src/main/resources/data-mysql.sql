@@ -2,7 +2,7 @@
 INSERT INTO app_user (email, password, name, balance)
 VALUES
 ('john.doe@example.com', 'hashed_password_1', 'John Doe', 1500.00),
-('jane.smith@example.com', 'hashed_password_2', 'Jane H2', 2450.50);
+('jane.smith@example.com', 'hashed_password_2', 'Jane Smith', 2450.50);
 
 -- Insert into category
 INSERT INTO category (name, description)
