@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Bill Form</title>
+    <link rel="stylesheet" href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css"/>
+</head>
+<body>
+<div class="container">
+<!--    <div th:replace="~{::navbar :: navbar}"></div>-->
+
+    <h2 th:text="${bill.id} == null ? 'Add New Bill' : 'Edit Bill'"></h2>
+
+    <form th:action="@{${bill.id} == null ? '/bills/add' : '/bills/edit/' + ${bill.id}}"
+          th:object="${bill}" method="post">
+
+        <div class="mb-3">
+            <label for="billName" class="form-label">Bill Name</label>
+            <input type="text" th:field="*{billName}" class="form-control" id="billName" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="amount" class="form-label">Amount</label>
+            <input type="number" step="0.01" th:field="*{amount}" class="form-control" id="amount" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="nextDueDate" class="form-label">Next Due Date</label>
+            <input type="date" th:field="*{nextDueDate}" class="form-control" id="nextDueDate" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea th:field="*{description}" class="form-control" id="description"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a th:href="@{/bills}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+</body>
+</html>
