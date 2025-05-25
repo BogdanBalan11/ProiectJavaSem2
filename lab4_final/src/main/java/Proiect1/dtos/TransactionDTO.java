@@ -14,5 +14,7 @@ public class TransactionDTO {
     private String transactionType; // INCOME/EXPENSE
     private Long userId;
     private Long categoryId;
+    private String categoryName;
+
 
 }

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Transactions</title>
+    <link rel="stylesheet" href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/webjars/font-awesome/6.5.2/css/all.min.css"/>
+</head>
+<body>
+<div class="container">
+    <div th:replace="fragments/navbar :: navbar"></div>
+
+    <h2 class="mt-4">Your Transactions</h2>
+    <a class="btn btn-success mb-3" th:href="@{/transactions/add}">
+        <i class="fas fa-plus"></i> Add Transaction
+    </a>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Type</th>
+            <th>Amount</th>
+            <th>Date</th>
+            <th>Category</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="tx : ${transactions}">
+            <td th:text="${tx.transactionType}">INCOME</td>
+            <td th:text="${tx.amount}">100.00</td>
+            <td th:text="${tx.transactionDate}">2025-01-01</td>
+            <td th:text="${tx.categoryName}">Category</td>
+            <td th:text="${tx.description}">Salary</td>
+            <td>
+                <a th:href="@{'/transactions/edit/' + ${tx.id}}" class="btn btn-primary btn-sm">Edit</a>
+                <a th:href="@{'/transactions/delete/' + ${tx.id}}" class="btn btn-danger btn-sm"
+                   onclick="return confirm('Delete this transaction?')">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

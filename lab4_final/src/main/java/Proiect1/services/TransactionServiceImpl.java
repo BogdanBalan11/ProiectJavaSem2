@@ -10,6 +10,10 @@ import Proiect1.repositories.TransactionRepository;
 import Proiect1.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class TransactionServiceImpl implements TransactionService{
 
@@ -55,4 +59,89 @@ public class TransactionServiceImpl implements TransactionService{
         transactionDTO.setId(transaction.getId());
         return transactionDTO;
     }
+
+    private TransactionDTO convertToDTO(Transaction tx) {
+        TransactionDTO dto = new TransactionDTO();
+        dto.setId(tx.getId());
+        dto.setAmount(tx.getAmount());
+        dto.setTransactionDate(tx.getTransactionDate());
+        dto.setDescription(tx.getDescription());
+        dto.setTransactionType(tx.getTransactionType());
+        dto.setUserId(tx.getUser().getId());
+        if (tx.getCategory() != null) {
+            dto.setCategoryId(tx.getCategory().getId());
+            dto.setCategoryName(tx.getCategory().getName());
+        }
+        return dto;
+    }
+
+    @Override
+    public List<TransactionDTO> getUserTransactions(Long userId) {
+        return transactionRepository.findByUserId(userId).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public TransactionDTO getTransactionById(Long id) {
+        Transaction tx = transactionRepository.findById(id)
+                .orElseThrow(() -> new ItemNotFound("Transaction"));
+        return convertToDTO(tx);
+    }
+
+    @Override
+    public void updateTransaction(Long id, TransactionDTO dto) {
+        Transaction tx = transactionRepository.findById(id)
+                .orElseThrow(() -> new ItemNotFound("Transaction"));
+
+        BigDecimal oldAmount = tx.getAmount();
+        String oldType = tx.getTransactionType();
+        User user = tx.getUser();
+
+        // reverse old amount
+        if ("EXPENSE".equalsIgnoreCase(oldType)) {
+            user.setBalance(user.getBalance().add(oldAmount));
+        } else if ("INCOME".equalsIgnoreCase(oldType)) {
+            user.setBalance(user.getBalance().subtract(oldAmount));
+        }
+
+        // update transaction
+        tx.setAmount(dto.getAmount());
+        tx.setTransactionDate(dto.getTransactionDate());
+        tx.setTransactionType(dto.getTransactionType());
+        tx.setDescription(dto.getDescription());
+
+        if (dto.getCategoryId() != null) {
+            Category cat = categoryRepository.findById(dto.getCategoryId())
+                    .orElseThrow(() -> new ItemNotFound("Category"));
+            tx.setCategory(cat);
+        }
+
+        // apply new balance effect
+        if ("EXPENSE".equalsIgnoreCase(dto.getTransactionType())) {
+            user.setBalance(user.getBalance().subtract(dto.getAmount()));
+        } else if ("INCOME".equalsIgnoreCase(dto.getTransactionType())) {
+            user.setBalance(user.getBalance().add(dto.getAmount()));
+        }
+
+        transactionRepository.save(tx);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void deleteTransaction(Long id) {
+        Transaction tx = transactionRepository.findById(id)
+                .orElseThrow(() -> new ItemNotFound("Transaction"));
+
+        User user = tx.getUser();
+        if ("EXPENSE".equalsIgnoreCase(tx.getTransactionType())) {
+            user.setBalance(user.getBalance().add(tx.getAmount()));
+        } else {
+            user.setBalance(user.getBalance().subtract(tx.getAmount()));
+        }
+
+        transactionRepository.delete(tx);
+        userRepository.save(user);
+    }
+
 }
