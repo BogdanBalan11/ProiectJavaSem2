@@ -9,4 +9,7 @@ import java.util.List;
 public interface BudgetService {
     BudgetDTO createBudget(Long userId, BudgetDTO budgetDTO);
     List<BudgetDTO> getUserBudgets(Long userId);
+    void updateBudget(Long id, BudgetDTO dto);
+    void deleteBudget(Long id);
+
 }

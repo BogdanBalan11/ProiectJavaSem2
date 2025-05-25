@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Budgets</title>
+    <link rel="stylesheet" href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/webjars/font-awesome/6.5.2/css/all.min.css"/>
+</head>
+<body>
+<div class="container">
+    <div th:replace="fragments/navbar :: navbar"></div>
+
+    <h2 class="mt-4">Your Budgets</h2>
+    <a class="btn btn-success mb-3" th:href="@{/budgets/add}">
+        <i class="fas fa-plus"></i> Add Budget
+    </a>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Amount</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="budget : ${budgets}">
+            <td th:text="${budget.amount}">1000</td>
+            <td th:text="${budget.startDate}">2025-01-01</td>
+            <td th:text="${budget.endDate}">2025-02-01</td>
+            <td>
+                <a th:href="@{'/budgets/edit/' + ${budget.id}}" class="btn btn-primary btn-sm">Edit</a>
+                <a th:href="@{'/budgets/delete/' + ${budget.id}}" class="btn btn-danger btn-sm"
+                   onclick="return confirm('Delete this budget?')">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

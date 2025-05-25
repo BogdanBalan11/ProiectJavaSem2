@@ -52,4 +52,22 @@ public class BudgetServiceImpl implements BudgetService{
         dto.setUserId(budget.getUser().getId());
         return dto;
     }
+
+    @Override
+    public void updateBudget(Long id, BudgetDTO dto) {
+        Budget budget = budgetRepository.findById(id)
+                .orElseThrow(() -> new ItemNotFound("Budget"));
+        budget.setAmount(dto.getAmount());
+        budget.setStartDate(dto.getStartDate());
+        budget.setEndDate(dto.getEndDate());
+        budgetRepository.save(budget);
+    }
+
+    @Override
+    public void deleteBudget(Long id) {
+        Budget budget = budgetRepository.findById(id)
+                .orElseThrow(() -> new ItemNotFound("Budget"));
+        budgetRepository.delete(budget);
+    }
+
 }
