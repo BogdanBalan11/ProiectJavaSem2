@@ -8,8 +8,7 @@
 </head>
 <body>
 <div class="container">
-    <!-- extract navbar later -->
-<!--    <div th:replace="~{::navbar :: navbar}"></div>-->
+    <div th:replace="fragments/navbar :: navbar"></div>
 
     <h2 class="mt-4">Your Bills</h2>
     <a class="btn btn-success mb-3" th:href="@{/bills/add}">

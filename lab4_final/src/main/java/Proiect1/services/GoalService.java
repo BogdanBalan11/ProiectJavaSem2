@@ -9,5 +9,7 @@ import java.util.List;
 public interface GoalService {
     GoalDTO createGoal(Long userId, GoalDTO goalDTO);
     List<GoalDTO> getUserGoals(Long userId);
+    void deleteGoal(Long goalId);
+
 
 }

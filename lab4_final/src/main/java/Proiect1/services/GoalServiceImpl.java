@@ -55,4 +55,12 @@ public class GoalServiceImpl implements GoalService{
         dto.setUserId(goal.getUser().getId());
         return dto;
     }
+
+    @Override
+    public void deleteGoal(Long goalId) {
+        Goal goal = goalRepository.findById(goalId)
+                .orElseThrow(() -> new ItemNotFound("Goal"));
+        goalRepository.delete(goal);
+    }
+
 }
