@@ -75,4 +75,11 @@ public class UserServiceImpl implements UserService {
                 .roles("USER")
                 .build();
     }
+
+    @Override
+    public UserDTO getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return convertToDTO(user);
+    }
 }
