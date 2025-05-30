@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>User Details</title>
+    <link rel="stylesheet" href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/webjars/font-awesome/6.5.2/css/all.min.css"/>
+    <style>
+        .balance-positive {
+            color: green;
+        }
+
+        .balance-negative {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div th:replace="fragments/navbar :: navbar"></div>
+
+    <h2 class="mt-4">User Details</h2>
+    <div class="card mt-3 p-4">
+        <p><strong>ID:</strong> <span th:text="${user.id}"></span></p>
+        <p><strong>Name:</strong> <span th:text="${user.name}"></span></p>
+        <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+        <p>
+            <strong>Balance:</strong>
+            <span th:if="${user.balance >= 0}" class="balance-positive">
+    <span th:text="${user.balance}"></span> <i class="fas fa-arrow-up"></i>
+</span>
+            <span th:if="${user.balance < 0}" class="balance-negative">
+    <span th:text="${user.balance}"></span> <i class="fas fa-arrow-down"></i>
+</span>
+
+        </p>
+    </div>
+</div>
+</body>
+</html>

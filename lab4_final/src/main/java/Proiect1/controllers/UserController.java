@@ -1,5 +1,6 @@
 package Proiect1.controllers;
 
+import Proiect1.dtos.UserDTO;
 import Proiect1.dtos.UserRegistrationDTO;
 import Proiect1.exceptions.UserWithSameEmailExists;
 import Proiect1.services.UserService;
@@ -9,6 +10,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+
+import java.security.Principal;
 
 @Controller
 public class UserController {
@@ -39,5 +42,13 @@ public class UserController {
             model.addAttribute("error", e.getMessage());
             return "register";
         }
+    }
+
+    @GetMapping("/")
+    public String userDetails(Model model, Principal principal) {
+        String email = principal.getName(); // from logged-in session
+        UserDTO userDTO = userService.getUserByEmail(email);
+        model.addAttribute("user", userDTO);
+        return "user-details";
     }
 }
