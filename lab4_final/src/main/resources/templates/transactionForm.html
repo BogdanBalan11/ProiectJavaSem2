@@ -47,6 +47,11 @@
             <textarea th:field="*{description}" class="form-control" id="description"></textarea>
         </div>
 
+        <div class="mb-3">
+            <label for="receiptDetails" class="form-label">Receipt Details</label>
+            <textarea th:field="*{receipt.details}" class="form-control" id="receiptDetails"></textarea>
+        </div>
+
         <button type="submit" class="btn btn-primary">Save</button>
         <a th:href="@{/transactions}" class="btn btn-secondary">Cancel</a>
     </form>

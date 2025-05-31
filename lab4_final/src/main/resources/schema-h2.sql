@@ -71,3 +71,11 @@ CREATE TABLE IF NOT EXISTS transaction (
   FOREIGN KEY (app_user_id) REFERENCES app_user (id) ON DELETE CASCADE,
   FOREIGN KEY (category_id) REFERENCES category (id) ON DELETE SET NULL
 );
+
+-- Receipt Table
+CREATE TABLE IF NOT EXISTS receipt (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    transaction_id BIGINT UNIQUE,
+    details VARCHAR(255),
+    FOREIGN KEY (transaction_id) REFERENCES transaction(id)
+);

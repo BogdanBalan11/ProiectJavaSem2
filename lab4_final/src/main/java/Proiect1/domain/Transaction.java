@@ -27,4 +27,7 @@ public class Transaction {
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
+
+    @OneToOne(mappedBy = "transaction", cascade = CascadeType.ALL)
+    private Receipt receipt;
 }

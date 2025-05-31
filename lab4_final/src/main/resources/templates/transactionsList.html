@@ -23,6 +23,7 @@
             <th>Date</th>
             <th>Category</th>
             <th>Description</th>
+            <th>Receipt</th>
             <th>Actions</th>
         </tr>
         </thead>
@@ -33,6 +34,7 @@
             <td th:text="${tx.transactionDate}">2025-01-01</td>
             <td th:text="${tx.categoryName}">Category</td>
             <td th:text="${tx.description}">Salary</td>
+            <td th:text="${tx.receipt?.details}">Receipt info</td>
             <td>
                 <a th:href="@{'/transactions/edit/' + ${tx.id}}" class="btn btn-primary btn-sm">Edit</a>
                 <a th:href="@{'/transactions/delete/' + ${tx.id}}" class="btn btn-danger btn-sm"

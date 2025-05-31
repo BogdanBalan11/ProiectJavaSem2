@@ -1,4 +1,5 @@
 DROP TABLE IF EXISTS user_budget;
+DROP TABLE IF EXISTS receipt;
 DROP TABLE IF EXISTS transaction;
 DROP TABLE IF EXISTS goal;
 DROP TABLE IF EXISTS budget;
@@ -78,4 +79,12 @@ CREATE TABLE IF NOT EXISTS transaction (
   PRIMARY KEY (id),
   FOREIGN KEY (app_user_id) REFERENCES app_user (id) ON DELETE CASCADE,
   FOREIGN KEY (category_id) REFERENCES category (id) ON DELETE SET NULL
+);
+
+-- Receipt Table
+CREATE TABLE IF NOT EXISTS receipt (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    transaction_id BIGINT UNIQUE,
+    details VARCHAR(255),
+    FOREIGN KEY (transaction_id) REFERENCES transaction(id)
 );

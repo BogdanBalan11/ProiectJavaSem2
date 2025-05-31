@@ -15,6 +15,6 @@ public class TransactionDTO {
     private Long userId;
     private Long categoryId;
     private String categoryName;
-
+    private ReceiptDTO receipt;
 
 }
