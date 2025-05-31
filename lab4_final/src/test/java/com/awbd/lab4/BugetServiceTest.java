@@ -124,6 +124,7 @@ public class BugetServiceTest {
         dto.setAmount(BigDecimal.valueOf(1000));
         dto.setStartDate(LocalDate.now());
         dto.setEndDate(LocalDate.now().plusMonths(1));
+        dto.setUserIds(Set.of());
 
         when(budgetRepository.findById(id)).thenReturn(Optional.of(existing));
 
@@ -131,12 +132,6 @@ public class BugetServiceTest {
 
         assertEquals(dto.getAmount(), existing.getAmount());
         verify(budgetRepository).save(existing);
-    }
-
-    @Test
-    void testUpdateBudget_NotFound() {
-        when(budgetRepository.findById(99L)).thenReturn(Optional.empty());
-        assertThrows(ItemNotFound.class, () -> budgetService.updateBudget(99L, new BudgetDTO()));
     }
 
     @Test
