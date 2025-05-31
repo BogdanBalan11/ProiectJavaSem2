@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 public class BudgetDTO {
@@ -11,6 +12,5 @@ public class BudgetDTO {
     private BigDecimal amount;
     private LocalDate startDate;
     private LocalDate endDate;
-    private Long userId;
-
+    private Set<Long> userIds;
 }

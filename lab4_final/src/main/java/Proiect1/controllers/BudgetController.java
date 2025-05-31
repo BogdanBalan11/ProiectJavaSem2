@@ -2,6 +2,7 @@ package Proiect1.controllers;
 
 import Proiect1.dtos.BudgetDTO;
 import Proiect1.exceptions.ItemNotFound;
+import Proiect1.repositories.UserRepository;
 import Proiect1.services.BudgetService;
 import Proiect1.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +17,13 @@ public class BudgetController {
 
     private final BudgetService budgetService;
     private final UserService userService;
+    private final UserRepository userRepository;
 
     @Autowired
-    public BudgetController(BudgetService budgetService, UserService userService) {
+    public BudgetController(BudgetService budgetService, UserService userService, UserRepository userRepository) {
         this.budgetService = budgetService;
         this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     private Long getCurrentUserId() {
@@ -38,6 +41,7 @@ public class BudgetController {
     @GetMapping("/add")
     public String showAddForm(Model model) {
         model.addAttribute("budget", new BudgetDTO());
+        model.addAttribute("users", userRepository.findAll());
         return "budgetForm";
     }
 

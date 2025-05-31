@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS user_budget;
 DROP TABLE IF EXISTS transaction;
 DROP TABLE IF EXISTS goal;
 DROP TABLE IF EXISTS budget;
@@ -41,9 +42,16 @@ CREATE TABLE IF NOT EXISTS budget (
   amount DECIMAL(15, 2) NOT NULL,
   start_date DATE NOT NULL,
   end_date DATE NOT NULL,
-  app_user_id BIGINT NOT NULL,
-  PRIMARY KEY (id),
-  FOREIGN KEY (app_user_id) REFERENCES app_user (id) ON DELETE CASCADE
+  PRIMARY KEY (id)
+);
+
+-- User-Budget Join Table
+CREATE TABLE IF NOT EXISTS user_budget (
+  user_id BIGINT NOT NULL,
+  budget_id BIGINT NOT NULL,
+  PRIMARY KEY (user_id, budget_id),
+  FOREIGN KEY (user_id) REFERENCES app_user (id) ON DELETE CASCADE,
+  FOREIGN KEY (budget_id) REFERENCES budget (id) ON DELETE CASCADE
 );
 
 -- Goal Table

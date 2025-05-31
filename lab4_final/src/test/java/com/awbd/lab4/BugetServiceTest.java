@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -45,6 +46,7 @@ public class BugetServiceTest {
         dto.setAmount(BigDecimal.valueOf(1000));
         dto.setStartDate(LocalDate.now());
         dto.setEndDate(LocalDate.now().plusMonths(1));
+        dto.setUserIds(Set.of());
 
         User user = new User();
         user.setId(userId);
@@ -56,7 +58,7 @@ public class BugetServiceTest {
         savedBudget.setAmount(dto.getAmount());
         savedBudget.setStartDate(dto.getStartDate());
         savedBudget.setEndDate(dto.getEndDate());
-        savedBudget.setUser(user);
+        savedBudget.setUsers(Set.of(user));
 
         when(budgetRepository.save(any(Budget.class))).thenReturn(savedBudget);
 
@@ -91,21 +93,21 @@ public class BugetServiceTest {
         b1.setAmount(BigDecimal.valueOf(500));
         b1.setStartDate(LocalDate.now());
         b1.setEndDate(LocalDate.now().plusDays(30));
-        b1.setUser(user);
+        b1.setUsers(Set.of(user));
 
         Budget b2 = new Budget();
         b2.setId(2L);
         b2.setAmount(BigDecimal.valueOf(800));
         b2.setStartDate(LocalDate.now());
         b2.setEndDate(LocalDate.now().plusDays(60));
-        b2.setUser(user);
+        b2.setUsers(Set.of(user));
 
-        when(budgetRepository.findByUserId(userId)).thenReturn(List.of(b1, b2));
+        when(budgetRepository.findByUsersId(userId)).thenReturn(List.of(b1, b2));
 
         List<BudgetDTO> result = budgetService.getUserBudgets(userId);
 
         assertEquals(2, result.size());
-        verify(budgetRepository).findByUserId(userId);
+        verify(budgetRepository).findByUsersId(userId);
     }
 
     @Test

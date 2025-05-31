@@ -18,10 +18,16 @@ VALUES
 ('Water Bill', 45.60, '2025-06-15', 'Monthly water usage', 2);
 
 -- Insert into budget
-INSERT INTO budget (amount, start_date, end_date, app_user_id)
+INSERT INTO budget (amount, start_date, end_date)
 VALUES
-(1000.00, '2025-05-01', '2025-05-31', 1),
-(1500.00, '2025-05-01', '2025-05-31', 2);
+(1000.00, '2025-05-01', '2025-05-31'),
+(1500.00, '2025-05-01', '2025-05-31');
+
+-- Insert into user_budget
+INSERT INTO user_budget (user_id, budget_id)
+VALUES
+(1, 1),
+(2, 2);
 
 -- Insert into goal
 INSERT INTO goal (goal_name, target_amount, saved_amount, deadline, app_user_id)

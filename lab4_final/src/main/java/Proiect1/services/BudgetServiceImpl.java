@@ -9,6 +9,8 @@ import Proiect1.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,19 +28,21 @@ public class BudgetServiceImpl implements BudgetService{
     public BudgetDTO createBudget(Long userId, BudgetDTO budgetDTO) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ItemNotFound("User"));
+        Set<User> users = budgetDTO.getUserIds().stream()
+                .map(id -> userRepository.findById(id).orElseThrow())
+                .collect(Collectors.toSet());
 
         Budget budget = new Budget();
         budget.setAmount(budgetDTO.getAmount());
         budget.setStartDate(budgetDTO.getStartDate());
         budget.setEndDate(budgetDTO.getEndDate());
-        budget.setUser(user);
-
+        budget.setUsers(users);
         budgetRepository.save(budget);
         return convertToDTO(budget);    }
 
     @Override
     public List<BudgetDTO> getUserBudgets(Long userId) {
-        return budgetRepository.findByUserId(userId).stream()
+        return budgetRepository.findByUsersId(userId).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -49,7 +53,9 @@ public class BudgetServiceImpl implements BudgetService{
         dto.setAmount(budget.getAmount());
         dto.setStartDate(budget.getStartDate());
         dto.setEndDate(budget.getEndDate());
-        dto.setUserId(budget.getUser().getId());
+        dto.setUserIds(budget.getUsers().stream()
+                .map(User::getId)
+                .collect(Collectors.toSet()));
         return dto;
     }
 
