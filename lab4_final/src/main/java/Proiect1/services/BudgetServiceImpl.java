@@ -61,11 +61,16 @@ public class BudgetServiceImpl implements BudgetService{
 
     @Override
     public void updateBudget(Long id, BudgetDTO dto) {
+        Set<User> users = dto.getUserIds().stream()
+                .map(userId -> userRepository.findById(userId).orElseThrow())
+                .collect(Collectors.toSet());
+
         Budget budget = budgetRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFound("Budget"));
         budget.setAmount(dto.getAmount());
         budget.setStartDate(dto.getStartDate());
         budget.setEndDate(dto.getEndDate());
+        budget.setUsers(users);
         budgetRepository.save(budget);
     }
 

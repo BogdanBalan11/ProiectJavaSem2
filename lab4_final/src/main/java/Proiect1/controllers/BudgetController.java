@@ -58,6 +58,7 @@ public class BudgetController {
                 .findFirst()
                 .orElseThrow(() -> new ItemNotFound("Budget"));
         model.addAttribute("budget", budget);
+        model.addAttribute("users", userRepository.findAll());
         return "budgetForm";
     }
 
