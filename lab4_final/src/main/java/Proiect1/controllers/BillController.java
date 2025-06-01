@@ -4,6 +4,8 @@ import Proiect1.dtos.BillDTO;
 import Proiect1.exceptions.ItemNotFound;
 import Proiect1.services.BillService;
 import Proiect1.services.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,6 +16,9 @@ import java.util.List;
 @Controller
 @RequestMapping("/bills")
 public class BillController {
+
+    private static final Logger logger = LoggerFactory.getLogger(BillController.class);
+
     BillService billService;
     private final UserService userService;
 
@@ -24,26 +29,24 @@ public class BillController {
 
     private Long getCurrentUserId() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        logger.debug("Authenticated user email: {}", email);
         return userService.getUserByEmail(email).getId();
     }
-
-//    @RequestMapping("")
-//    public String billsList(Model model) {
-//        List<BillDTO> bills = billService.getUserBills(1L);
-//        model.addAttribute("bills", bills);
-//        return "billsList";
-//    }
 
     @GetMapping("")
     public String listBills(Model model) {
         Long userId = getCurrentUserId();
+        logger.info("Fetching bills for userId={}", userId);
+
         List<BillDTO> bills = billService.getUserBills(userId);
+        logger.info("Found {} bills for userId={}", bills.size(), userId);
         model.addAttribute("bills", bills);
         return "billList";
     }
 
     @GetMapping("/add")
     public String showAddForm(Model model) {
+        logger.debug("Showing bill add form");
         model.addAttribute("bill", new BillDTO());
         return "billForm";
     }
@@ -51,29 +54,36 @@ public class BillController {
     @PostMapping("/add")
     public String saveBill(@ModelAttribute("bill") BillDTO billDTO) {
         Long userId = getCurrentUserId();
+        logger.info("Creating new bill for userId={} with name={}", userId, billDTO.getBillName());
         billService.createBill(userId, billDTO);
         return "redirect:/bills";
     }
 
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
+        logger.debug("Showing edit form for billId={}", id);
         BillDTO bill = billService.getUserBills(getCurrentUserId())
                 .stream()
                 .filter(b -> b.getId().equals(id))
                 .findFirst()
-                .orElseThrow(() -> new ItemNotFound("Bill"));
+                .orElseThrow(()-> {
+                    logger.warn("Bill with id={} not found", id);
+                    return new ItemNotFound("Bill");
+                });
         model.addAttribute("bill", bill);
         return "billForm";
     }
 
     @PostMapping("/edit/{id}")
     public String updateBill(@PathVariable Long id, @ModelAttribute("bill") BillDTO billDTO) {
+        logger.info("Updating bill id={} with new name={}", id, billDTO.getBillName());
         billService.updateBill(id, billDTO);
         return "redirect:/bills";
     }
 
     @GetMapping("/delete/{id}")
     public String deleteBill(@PathVariable Long id) {
+        logger.info("Deleting bill with id={}", id);
         billService.deleteBill(id);
         return "redirect:/bills";
     }

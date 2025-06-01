@@ -6,6 +6,8 @@ import Proiect1.dtos.UserLoginDTO;
 import Proiect1.dtos.UserRegistrationDTO;
 import Proiect1.exceptions.UserWithSameEmailExists;
 import Proiect1.repositories.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,6 +20,8 @@ import java.util.Optional;
 @Service
 public class UserServiceImpl implements UserService {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -28,9 +32,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO registerUser(UserRegistrationDTO registrationDTO) {
-        boolean userWithSameEmailExists = userRepository.existsByEmail(registrationDTO.getEmail());
+        logger.debug("Checking if email already exists: {}", registrationDTO.getEmail());
 
-        if (userWithSameEmailExists) {
+        if (userRepository.existsByEmail(registrationDTO.getEmail())) {
+            logger.warn("Registration failed - user already exists: {}", registrationDTO.getEmail());
             throw new UserWithSameEmailExists();
         }
 
@@ -41,18 +46,22 @@ public class UserServiceImpl implements UserService {
         user.setBalance(BigDecimal.ZERO);
 
         userRepository.save(user);
+        logger.info("User registered: {}", user.getEmail());
         return convertToDTO(user);
     }
 
     @Override
     public UserDTO loginUser(UserLoginDTO loginDTO) {
+        logger.debug("Login attempt for email: {}", loginDTO.getEmail());
         Optional<User> userOpt = userRepository.findByEmail(loginDTO.getEmail());
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             if (passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
+                logger.info("Login successful for user: {}", user.getEmail());
                 return convertToDTO(user);
             }
         }
+        logger.warn("Login failed for email: {}", loginDTO.getEmail());
         throw new BadCredentialsException("Invalid email or password");
     }
 
@@ -67,8 +76,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        logger.debug("Loading user by username (email): {}", email);
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> {
+                    logger.error("User not found during authentication: {}", email);
+                    return new UsernameNotFoundException("User not found");
+                });
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getEmail())
                 .password(user.getPassword())
@@ -78,8 +91,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO getUserByEmail(String email) {
+        logger.debug("Fetching user by email: {}", email);
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> {
+                    logger.error("User not found: {}", email);
+                    return new UsernameNotFoundException("User not found");
+                });
         return convertToDTO(user);
     }
 }

@@ -4,6 +4,8 @@ import Proiect1.dtos.TransactionDTO;
 import Proiect1.repositories.CategoryRepository;
 import Proiect1.services.TransactionService;
 import Proiect1.services.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -15,6 +17,8 @@ import java.util.List;
 @Controller
 @RequestMapping("/transactions")
 public class TransactionController {
+
+    private static final Logger logger = LoggerFactory.getLogger(TransactionController.class);
 
     private final TransactionService transactionService;
     private final UserService userService;
@@ -37,6 +41,7 @@ public class TransactionController {
     @GetMapping("")
     public String listTransactions(Model model) {
         Long userId = getCurrentUserId();
+        logger.info("Listing transactions for userId={}", userId);
         List<TransactionDTO> transactions = transactionService.getUserTransactions(userId);
         model.addAttribute("transactions", transactions);
         return "transactionsList";
@@ -44,6 +49,7 @@ public class TransactionController {
 
     @GetMapping("/add")
     public String showAddForm(Model model) {
+        logger.debug("Opening transaction add form");
         TransactionDTO dto = new TransactionDTO();
         dto.setUserId(getCurrentUserId());
         model.addAttribute("transaction", dto);
@@ -53,12 +59,14 @@ public class TransactionController {
 
     @PostMapping("/add")
     public String addTransaction(@ModelAttribute("transaction") TransactionDTO transactionDTO) {
+        logger.info("Adding new transaction of type={} and amount={}", transactionDTO.getTransactionType(), transactionDTO.getAmount());
         transactionService.addTransaction(transactionDTO);
         return "redirect:/transactions";
     }
 
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
+        logger.debug("Opening edit form for transactionId={}", id);
         TransactionDTO transaction = transactionService.getTransactionById(id);
         model.addAttribute("transaction", transaction);
         model.addAttribute("categories", categoryRepository.findAll());
@@ -68,12 +76,14 @@ public class TransactionController {
     @PostMapping("/edit/{id}")
     public String updateTransaction(@PathVariable Long id,
                                     @ModelAttribute("transaction") TransactionDTO transactionDTO) {
+        logger.info("Updating transaction with id={}", id);
         transactionService.updateTransaction(id, transactionDTO);
         return "redirect:/transactions";
     }
 
     @GetMapping("/delete/{id}")
     public String deleteTransaction(@PathVariable Long id) {
+        logger.warn("Deleting transaction with id={}", id);
         transactionService.deleteTransaction(id);
         return "redirect:/transactions";
     }

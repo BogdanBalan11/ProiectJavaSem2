@@ -10,6 +10,8 @@ import Proiect1.exceptions.ItemNotFound;
 import Proiect1.repositories.CategoryRepository;
 import Proiect1.repositories.TransactionRepository;
 import Proiect1.repositories.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -18,6 +20,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class TransactionServiceImpl implements TransactionService{
+
+    private static final Logger logger = LoggerFactory.getLogger(TransactionServiceImpl.class);
+
 
     private final UserRepository userRepository;
     private final TransactionRepository transactionRepository;
@@ -31,13 +36,23 @@ public class TransactionServiceImpl implements TransactionService{
 
     @Override
     public TransactionDTO addTransaction(TransactionDTO transactionDTO) {
+        logger.debug("Attempting to add transaction for userId={}, type={}, amount={}",
+                transactionDTO.getUserId(), transactionDTO.getTransactionType(), transactionDTO.getAmount());
+
+
         User user = userRepository.findById(transactionDTO.getUserId())
-                .orElseThrow(() -> new ItemNotFound("User"));
+                .orElseThrow(() -> {
+                    logger.error("User not found: {}", transactionDTO.getUserId());
+                    return new ItemNotFound("User");
+                });
 
         Category category = null;
         if (transactionDTO.getCategoryId() != null) {
             category = categoryRepository.findById(transactionDTO.getCategoryId())
-                    .orElseThrow(() -> new ItemNotFound("Category"));
+                    .orElseThrow(() -> {
+                        logger.error("Category not found: {}", transactionDTO.getCategoryId());
+                        return new ItemNotFound("Category");
+                    });
         }
 
         Transaction transaction = new Transaction();
@@ -60,10 +75,13 @@ public class TransactionServiceImpl implements TransactionService{
             receipt.setDetails(transactionDTO.getReceipt().getDetails());
             receipt.setTransaction(transaction); // associate the receipt with the transaction
             transaction.setReceipt(receipt);     // associate the transaction with the receipt
+            logger.debug("Receipt associated with transaction: {}", receipt.getDetails());
         }
 
         transactionRepository.save(transaction);
         userRepository.save(user); // update user’s balance
+        logger.info("Transaction added successfully: id={}, new balance={}",
+                transaction.getId(), user.getBalance());
 
         transactionDTO.setId(transaction.getId());
         return transactionDTO;
@@ -91,6 +109,7 @@ public class TransactionServiceImpl implements TransactionService{
 
     @Override
     public List<TransactionDTO> getUserTransactions(Long userId) {
+        logger.debug("Fetching transactions for userId={}", userId);
         return transactionRepository.findByUserId(userId).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
@@ -98,6 +117,7 @@ public class TransactionServiceImpl implements TransactionService{
 
     @Override
     public TransactionDTO getTransactionById(Long id) {
+        logger.debug("Fetching transaction by id={}", id);
         Transaction tx = transactionRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFound("Transaction"));
         return convertToDTO(tx);
@@ -105,8 +125,14 @@ public class TransactionServiceImpl implements TransactionService{
 
     @Override
     public void updateTransaction(Long id, TransactionDTO dto) {
+        logger.debug("Updating transaction id={} with new amount={}, type={}",
+                id, dto.getAmount(), dto.getTransactionType());
+
         Transaction tx = transactionRepository.findById(id)
-                .orElseThrow(() -> new ItemNotFound("Transaction"));
+                .orElseThrow(() -> {
+                    logger.error("Transaction not found: {}", id);
+                    return new ItemNotFound("Transaction");
+                });
 
         BigDecimal oldAmount = tx.getAmount();
         String oldType = tx.getTransactionType();
@@ -127,7 +153,10 @@ public class TransactionServiceImpl implements TransactionService{
 
         if (dto.getCategoryId() != null) {
             Category cat = categoryRepository.findById(dto.getCategoryId())
-                    .orElseThrow(() -> new ItemNotFound("Category"));
+                    .orElseThrow(() -> {
+                        logger.error("Category not found during update: {}", dto.getCategoryId());
+                        return new ItemNotFound("Category");
+                    });
             tx.setCategory(cat);
         }
 
@@ -151,10 +180,12 @@ public class TransactionServiceImpl implements TransactionService{
 
         transactionRepository.save(tx);
         userRepository.save(user);
+        logger.info("Transaction updated: id={}, new balance={}", id, user.getBalance());
     }
 
     @Override
     public void deleteTransaction(Long id) {
+        logger.warn("Deleting transaction id={}", id);
         Transaction tx = transactionRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFound("Transaction"));
 
@@ -167,6 +198,7 @@ public class TransactionServiceImpl implements TransactionService{
 
         transactionRepository.delete(tx);
         userRepository.save(user);
+        logger.info("Transaction deleted: id={}, updated balance={}", id, user.getBalance());
     }
 
 }
