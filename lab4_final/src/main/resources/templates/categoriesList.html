@@ -24,7 +24,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="category : ${categories}">
+        <tr th:each="category : ${categoryPage.content}">
             <td th:text="${category.name}">Groceries</td>
             <td th:text="${category.description}">Food and daily needs</td>
             <td>
@@ -35,6 +35,20 @@
         </tr>
         </tbody>
     </table>
+    <nav th:if="${totalPages > 1}">
+        <ul class="pagination justify-content-end">
+            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                <a class="page-link" th:href="@{/categories(page=${currentPage - 1}, size=5)}">Previous</a>
+            </li>
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                th:classappend="${i == currentPage} ? 'active'">
+                <a class="page-link" th:href="@{/categories(page=${i}, size=5)}" th:text="${i + 1}">1</a>
+            </li>
+            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                <a class="page-link" th:href="@{/categories(page=${currentPage + 1}, size=5)}">Next</a>
+            </li>
+        </ul>
+    </nav>
 </div>
 </body>
 </html>

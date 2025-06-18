@@ -8,6 +8,8 @@ import Proiect1.repositories.BillRepository;
 import Proiect1.repositories.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -96,4 +98,11 @@ public class BillServiceImpl implements BillService {
         dto.setUserId(bill.getUser().getId());
         return dto;
     }
+
+    @Override
+    public Page<BillDTO> getUserBillsPaginated(Long userId, Pageable pageable) {
+        Page<Bill> bills = billRepository.findByUserId(userId, pageable);
+        return bills.map(this::convertToDTO);
+    }
+
 }

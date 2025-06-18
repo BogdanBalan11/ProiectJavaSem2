@@ -28,7 +28,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="tx : ${transactions}">
+        <tr th:each="tx : ${transactionPage.content}">
             <td th:text="${tx.transactionType}">INCOME</td>
             <td th:text="${tx.amount}">100.00</td>
             <td th:text="${tx.transactionDate}">2025-01-01</td>
@@ -43,6 +43,20 @@
         </tr>
         </tbody>
     </table>
+    <nav th:if="${totalPages > 1}">
+        <ul class="pagination justify-content-end">
+            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                <a class="page-link" th:href="@{/transactions(page=${currentPage - 1}, size=5)}">Previous</a>
+            </li>
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                th:classappend="${i == currentPage} ? 'active'">
+                <a class="page-link" th:href="@{/transactions(page=${i}, size=5)}" th:text="${i + 1}">1</a>
+            </li>
+            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                <a class="page-link" th:href="@{/transactions(page=${currentPage + 1}, size=5)}">Next</a>
+            </li>
+        </ul>
+    </nav>
 </div>
 </body>
 </html>

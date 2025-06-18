@@ -6,13 +6,16 @@ import Proiect1.services.TransactionService;
 import Proiect1.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @Controller
 @RequestMapping("/transactions")
@@ -39,11 +42,18 @@ public class TransactionController {
     }
 
     @GetMapping("")
-    public String listTransactions(Model model) {
+    public String listTransactions(Model model,
+                                   @RequestParam(defaultValue = "0") int page,
+                                   @RequestParam(defaultValue = "5") int size) {
         Long userId = getCurrentUserId();
         logger.info("Listing transactions for userId={}", userId);
-        List<TransactionDTO> transactions = transactionService.getUserTransactions(userId);
-        model.addAttribute("transactions", transactions);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("transactionDate").descending());
+        Page<TransactionDTO> transactionPage = transactionService.getUserTransactionsPaginated(userId, pageable);
+
+        model.addAttribute("transactionPage", transactionPage);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", transactionPage.getTotalPages());
+
         return "transactionsList";
     }
 

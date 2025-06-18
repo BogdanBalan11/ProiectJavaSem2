@@ -1,6 +1,8 @@
 package Proiect1.services;
 
 import Proiect1.dtos.BillDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,4 +13,6 @@ public interface BillService {
     List<BillDTO> getUserBills(Long userId);
     BillDTO updateBill(Long billId, BillDTO billDTO);
     void deleteBill(Long billId);
+    Page<BillDTO> getUserBillsPaginated(Long userId, Pageable pageable);
+
 }

@@ -56,6 +56,10 @@ public class UserController {
 
     @GetMapping("/")
     public String userDetails(Model model, Principal principal) {
+        if (principal == null) {
+            logger.warn("Unauthenticated access to user details page");
+            return "redirect:/login";
+        }
         String email = principal.getName(); // from logged-in session
         logger.debug("Fetching user details for: {}", email);
         UserDTO userDTO = userService.getUserByEmail(email);

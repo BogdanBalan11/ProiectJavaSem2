@@ -5,6 +5,10 @@ import Proiect1.dtos.CategoryDTO;
 import Proiect1.repositories.CategoryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,9 +28,17 @@ public class CategoryController {
     }
 
     @GetMapping("")
-    public String listCategories(Model model) {
+    public String listCategories(Model model,
+                                 @RequestParam(defaultValue = "0") int page,
+                                 @RequestParam(defaultValue = "5") int size) {
         logger.info("Fetching all categories");
-        model.addAttribute("categories", categoryRepository.findAll());
+        Pageable pageable = PageRequest.of(page, size, Sort.by("name").ascending());
+        Page<Category> categoryPage = categoryRepository.findAll(pageable);
+
+        model.addAttribute("categoryPage", categoryPage);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", categoryPage.getTotalPages());
+
         return "categoriesList";
     }
 

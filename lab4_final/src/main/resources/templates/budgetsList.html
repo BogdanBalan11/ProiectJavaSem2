@@ -25,7 +25,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="budget : ${budgets}">
+        <tr th:each="budget : ${budgetPage.content}">
             <td th:text="${budget.amount}">1000</td>
             <td th:text="${budget.startDate}">2025-01-01</td>
             <td th:text="${budget.endDate}">2025-02-01</td>
@@ -37,6 +37,20 @@
         </tr>
         </tbody>
     </table>
+    <nav th:if="${totalPages > 1}">
+        <ul class="pagination justify-content-end">
+            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                <a class="page-link" th:href="@{/budgets(page=${currentPage - 1}, size=5)}">Previous</a>
+            </li>
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                th:classappend="${i == currentPage} ? 'active'">
+                <a class="page-link" th:href="@{/budgets(page=${i}, size=5)}" th:text="${i + 1}">1</a>
+            </li>
+            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                <a class="page-link" th:href="@{/budgets(page=${currentPage + 1}, size=5)}">Next</a>
+            </li>
+        </ul>
+    </nav>
 </div>
 </body>
 </html>

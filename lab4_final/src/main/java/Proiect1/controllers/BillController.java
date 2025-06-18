@@ -6,12 +6,15 @@ import Proiect1.services.BillService;
 import Proiect1.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @Controller
 @RequestMapping("/bills")
@@ -34,13 +37,18 @@ public class BillController {
     }
 
     @GetMapping("")
-    public String listBills(Model model) {
+    public String listBills(Model model,
+                            @RequestParam(defaultValue = "0") int page,
+                            @RequestParam(defaultValue = "5") int size) {
         Long userId = getCurrentUserId();
         logger.info("Fetching bills for userId={}", userId);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("nextDueDate").ascending());
+        Page<BillDTO> billPage = billService.getUserBillsPaginated(userId, pageable);
 
-        List<BillDTO> bills = billService.getUserBills(userId);
-        logger.info("Found {} bills for userId={}", bills.size(), userId);
-        model.addAttribute("bills", bills);
+        model.addAttribute("billPage", billPage);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", billPage.getTotalPages());
+
         return "billList";
     }
 

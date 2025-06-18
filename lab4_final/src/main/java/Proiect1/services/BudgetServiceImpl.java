@@ -8,10 +8,11 @@ import Proiect1.repositories.BudgetRepository;
 import Proiect1.repositories.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -106,6 +107,12 @@ public class BudgetServiceImpl implements BudgetService{
                 });
         budgetRepository.delete(budget);
         logger.info("Deleted budget with id={}", id);
+    }
+
+    @Override
+    public Page<BudgetDTO> getUserBudgetsPaginated(Long userId, Pageable pageable) {
+        Page<Budget> page = budgetRepository.findByUsersId(userId, pageable);
+        return page.map(this::convertToDTO);
     }
 
 }

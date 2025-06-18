@@ -1,6 +1,8 @@
 package Proiect1.services;
 
 import Proiect1.dtos.TransactionDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,5 +14,6 @@ public interface TransactionService {
     TransactionDTO getTransactionById(Long id);
     void updateTransaction(Long id, TransactionDTO dto);
     void deleteTransaction(Long id);
+    Page<TransactionDTO> getUserTransactionsPaginated(Long userId, Pageable pageable);
 
 }

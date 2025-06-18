@@ -6,6 +6,10 @@ import Proiect1.services.GoalService;
 import Proiect1.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -34,10 +38,18 @@ public class GoalController {
     }
 
     @GetMapping("")
-    public String listGoals(Model model) {
+    public String listGoals(Model model,
+                            @RequestParam(defaultValue = "0") int page,
+                            @RequestParam(defaultValue = "5") int size) {
         Long userId = getCurrentUserId();
         logger.info("Fetching goals for userId={}", userId);
-        model.addAttribute("goals", goalService.getUserGoals(userId));
+        Pageable pageable = PageRequest.of(page, size, Sort.by("deadline").ascending());
+        Page<GoalDTO> goalPage = goalService.getUserGoalsPaginated(userId, pageable);
+
+        model.addAttribute("goalPage", goalPage);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", goalPage.getTotalPages());
+
         return "goalsList";
     }
 

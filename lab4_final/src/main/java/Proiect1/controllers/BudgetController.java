@@ -7,6 +7,10 @@ import Proiect1.services.BudgetService;
 import Proiect1.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -37,10 +41,18 @@ public class BudgetController {
     }
 
     @GetMapping("")
-    public String listBudgets(Model model) {
+    public String listBudgets(Model model,
+                              @RequestParam(defaultValue = "0") int page,
+                              @RequestParam(defaultValue = "5") int size) {
         Long userId = getCurrentUserId();
         logger.info("Fetching budgets for userId={}", userId);
-        model.addAttribute("budgets", budgetService.getUserBudgets(userId));
+        Pageable pageable = PageRequest.of(page, size, Sort.by("startDate").descending());
+        Page<BudgetDTO> budgetPage = budgetService.getUserBudgetsPaginated(userId, pageable);
+
+        model.addAttribute("budgetPage", budgetPage);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", budgetPage.getTotalPages());
+
         return "budgetsList";
     }
 
