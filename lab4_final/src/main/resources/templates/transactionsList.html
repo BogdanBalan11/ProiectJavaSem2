@@ -18,10 +18,42 @@
     <table class="table table-striped">
         <thead>
         <tr>
-            <th>Type</th>
-            <th>Amount</th>
-            <th>Date</th>
-            <th>Category</th>
+            <th>
+                <a th:href="@{/transactions(sort='transactionType',
+                              dir=${sortField == 'transactionType' and sortDir == 'asc' ? 'desc' : 'asc'},
+                              page=${currentPage}, size=5)}">
+                    Type
+                    <i class="fa"
+                       th:classappend="${sortField == 'transactionType'} ?
+         (sortDir == 'asc' ? ' fa-sort-up' : ' fa-sort-down') : ' fa-sort'">
+                    </i>
+                </a>
+            </th>
+            <th>
+                <a th:href="@{/transactions(sort='amount', dir=${sortField == 'amount' and sortDir == 'asc' ? 'desc' : 'asc'}, page=${currentPage}, size=5)}">
+                    Amount
+                    <i class="fa"
+                       th:classappend="${sortField == 'amount'} ? (sortDir == 'asc' ? ' fa-sort-up' : ' fa-sort-down') : ' fa-sort'"></i>
+                </a>
+            </th>
+            <th>
+                <a th:href="@{/transactions(sort='transactionDate', dir=${sortField == 'transactionDate' and sortDir == 'asc' ? 'desc' : 'asc'}, page=${currentPage}, size=5)}">
+                    Date
+                    <i class="fa"
+                       th:classappend="${sortField == 'transactionDate'} ? (sortDir == 'asc' ? ' fa-sort-up' : ' fa-sort-down') : ' fa-sort'"></i>
+                </a>
+            </th>
+            <th>
+                <a th:href="@{/transactions(sort='categoryName',
+                              dir=${sortField == 'categoryName' and sortDir == 'asc' ? 'desc' : 'asc'},
+                              page=${currentPage}, size=5)}">
+                    Category
+                    <i class="fa"
+                       th:classappend="${sortField == 'categoryName'} ?
+         (sortDir == 'asc' ? ' fa-sort-up' : ' fa-sort-down') : ' fa-sort'">
+                    </i>
+                </a>
+            </th>
             <th>Description</th>
             <th>Receipt</th>
             <th>Actions</th>

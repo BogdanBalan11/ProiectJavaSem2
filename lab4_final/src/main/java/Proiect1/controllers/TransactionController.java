@@ -44,15 +44,25 @@ public class TransactionController {
     @GetMapping("")
     public String listTransactions(Model model,
                                    @RequestParam(defaultValue = "0") int page,
-                                   @RequestParam(defaultValue = "5") int size) {
+                                   @RequestParam(defaultValue = "5") int size,
+                                   @RequestParam(defaultValue = "transactionDate") String sort,
+                                   @RequestParam(defaultValue = "asc") String dir) {
+
+
+
+
         Long userId = getCurrentUserId();
         logger.info("Listing transactions for userId={}", userId);
-        Pageable pageable = PageRequest.of(page, size, Sort.by("transactionDate").descending());
+        Sort.Direction direction = dir.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        PageRequest pageable = PageRequest.of(page, size, Sort.by(direction, sort));
+       // Pageable pageable = PageRequest.of(page, size, Sort.by("transactionDate").descending());
         Page<TransactionDTO> transactionPage = transactionService.getUserTransactionsPaginated(userId, pageable);
 
         model.addAttribute("transactionPage", transactionPage);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", transactionPage.getTotalPages());
+        model.addAttribute("sortField", sort);
+        model.addAttribute("sortDir", dir);
 
         return "transactionsList";
     }
